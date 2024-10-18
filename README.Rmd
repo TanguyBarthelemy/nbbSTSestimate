@@ -68,7 +68,8 @@ library("nbbSTSestimate")
 ## Adding specific input
 outliers_input <- data.frame(
     series_name = c("GroceryStores", "GroceryStores", "BookStores", "ShoeStores"),
-    outliers = c("LS_2008M12", "AO_2002M04", "auto", "auto")
+    outliers = c("LS_2008M12", "AO_2002M04", "auto", "auto"), 
+    stringsAsFactors = FALSE
 )
 rslt2 <- estimateSTS(
     x,
