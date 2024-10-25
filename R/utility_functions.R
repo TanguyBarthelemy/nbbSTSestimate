@@ -22,11 +22,9 @@ is.convertible.to.date <- function(x) !is.na(as.Date(as.character(x), tz = 'UTC'
 
 # Check if stsmodel provided by the user is valid
 check_stsmodel <- function(x, stsmodel){
-  if (frequency(x) == 1){
-    if (stsmodel == "bsm"){
-      stsmodel<-"auto"
-      warning("You cannot defined stsmodel = 'bsm' with yearly data. stsmodel = 'auto' was considered instead. Please check your input if you want it otherwise.", call. = FALSE)
-    }
+  if (frequency(x) == 1 && stsmodel == "bsm"){
+    stsmodel<-"auto"
+    warning("You cannot defined stsmodel = 'bsm' with yearly data. stsmodel = 'auto' was considered instead. Please check your input if you want it otherwise.", call. = FALSE)
   }
   return(stsmodel)
 }
@@ -46,14 +44,12 @@ handle_stsmodel_df <- function(x, stsmodel.df){
       for(i in seq_len(nrow(stsmodel.df))){
         if (!stsmodel.df[i,2] %in% c("auto", "bsm", "llt", "ll", "noise")){
           stsmodel.df[i,2]<-"auto"
-          warning(paste0(stsmodel.df[i,1], ": the stsmodel submitted for this series is not valid. stsmodel = 'auto' was considered instead. Please check your input if you want it otherwise."), call. = FALSE)
+          warning(stsmodel.df[i,1], ": the stsmodel submitted for this series is not valid. stsmodel = 'auto' was considered instead. Please check your input if you want it otherwise.", call. = FALSE)
         }
 
-        if (frequency(x) == 1){
-          if (stsmodel.df[i,2] == "bsm"){
-            stsmodel.df[i,2]<-"auto"
-            warning(paste0(stsmodel.df[i,1], ": you cannot defined stsmodel = 'bsm' with yearly data. stsmodel = 'auto' was considered instead. Please check your input if you want it otherwise."), call. = FALSE)
-          }
+        if (frequency(x) == 1 && stsmodel.df[i,2] == "bsm"){
+          stsmodel.df[i,2]<-"auto"
+          warning(stsmodel.df[i,1], ": you cannot defined stsmodel = 'bsm' with yearly data. stsmodel = 'auto' was considered instead. Please check your input if you want it otherwise.", call. = FALSE)
         }
       }
 
@@ -67,7 +63,7 @@ handle_stsmodel_df <- function(x, stsmodel.df){
       ## series name in stsmodel.df but not in the data
       for(s in series_names){
         if (!s %in% colnames(x)){
-          stop(paste0("The series name ", s, " is mentionned in stsmodel.df but it is not found in the data. Please check your input."))
+          stop("The series name ", s, " is mentionned in stsmodel.df but it is not found in the data. Please check your input.")
         }
       }
       ## series name in the data but not in stsmodel.df
@@ -75,7 +71,7 @@ handle_stsmodel_df <- function(x, stsmodel.df){
       for(s in x_series_names){
         if (!s %in% series_names){
           stsmodel.df<-rbind(stsmodel.df, c(s, "auto"))
-          warning(paste0("The series name ", s, " is in the data but it is not mentionned in stsmodel.df. An 'auto' model was defined by default for this series."), call. = FALSE)
+          warning("The series name ", s, " is in the data but it is not mentionned in stsmodel.df. An 'auto' model was defined by default for this series.", call. = FALSE)
         }
       }
     } else {
@@ -98,7 +94,7 @@ handle_outliers_data <- function(x, outliers.data){
          The outliers should contain two columns: the first one called 'series_name' and the second one called 'outliers'.
          The outliers should be mentionned in a specific format (e.g. AO_2020Q2, AO_2020M4) or they can be defined as 'auto'.")
     } else {
-      if (all(colnames(outliers.data) %in% c("series_name", "outliers"))){
+      if (all(colnames(outliers.data) %in% c("series_name", "outliers"))) {
         outliers.data<-data.frame(lapply(outliers.data, as.character), stringsAsFactors=FALSE)
         series_names<-unique(outliers.data$series_name)
 
@@ -106,7 +102,7 @@ handle_outliers_data <- function(x, outliers.data){
           ## series name in outliers.data but not in the data
           for(s in series_names){
             if (!s %in% colnames(x)){
-              stop(paste0("The series name ", s, " is mentionned in outliers.data but it is not found in the data. Please check your input."))
+              stop("The series name ", s, " is mentionned in outliers.data but it is not found in the data. Please check your input.")
             }
           }
           ## series name in the data but not in outliers.data
@@ -114,7 +110,7 @@ handle_outliers_data <- function(x, outliers.data){
           for(s in x_series_names){
             if (!s %in% series_names){
               outliers.data<-rbind(outliers.data, c(s, "auto"))
-              warning(paste0("The series name ", s, " is in the data but it is not mentionned in outliers.data. An outliers='auto' was defined by default for this series."), call. = FALSE)
+              warning("The series name ", s, " is in the data but it is not mentionned in outliers.data. An outliers='auto' was defined by default for this series.", call. = FALSE)
             }
           }
         }
@@ -147,7 +143,7 @@ handle_outliers_data <- function(x, outliers.data){
 
       for(t in type){
         if (!t %in% c('AO','LS','TC','SO')){
-          stop(paste0(t, " is not a proper type of outliers. Only AO, LS, TC and SO are handled."))
+          stop(t, " is not a proper type of outliers. Only AO, LS, TC and SO are handled.")
         }
       }
 
@@ -158,19 +154,19 @@ handle_outliers_data <- function(x, outliers.data){
         yri<-as.numeric(yr[i])
         peri<-as.numeric(per[i])
 
-        if (is.na(yri)){stop(paste0(yri, " is not a proper year in outliers definition."))}
-        if (is.na(peri)){stop(paste0(peri, " is not a proper quarter or month in outliers definition."))}
+        if (is.na(yri)){stop(yri, " is not a proper year in outliers definition.")}
+        if (is.na(peri)){stop(peri, " is not a proper quarter or month in outliers definition.")}
 
         if (yri<start(x)[1] || yri>end(x)[1] || (yri==start(x)[1] && peri<start(x)[2]) || (yri==end(x)[1] && peri>end(x)[2])) {
-          stop(paste0("The outlier ", outliers[i], " is outside the range of the series."))
+          stop("The outlier ", outliers[i], " is outside the range of the series.")
         }
       }
 
       freq_outliers<-substr(outliers,8,8)
       if (frequency(x)==4){
         if (!all(freq_outliers=="Q")){stop("Frequency declared in outliers description does not match the actual frequency of the series.")}
-      } else if (frequency(x)==12){
-        if (!all(freq_outliers=="M")){stop("Frequency declared in outliers description does not match the actual frequency of the series.")}
+      } else if (frequency(x)==12 && !all(freq_outliers=="M")){
+        stop("Frequency declared in outliers description does not match the actual frequency of the series.")
       }
 
       for(i in seq_along(outliers)){
@@ -228,7 +224,7 @@ handle_cal_effect_df <- function(x, cal.effect.df){
       ## series name in cal.effect.df but not in the data
       for(s in series_names){
         if (!s %in% colnames(x)){
-          stop(paste0("The series name ", s, " is mentionned in cal.effect.df but it is not found in the data. Please check your input."))
+          stop("The series name ", s, " is mentionned in cal.effect.df but it is not found in the data. Please check your input.")
         }
       }
       ## series name in the data but not in cal.effect.df
@@ -236,7 +232,7 @@ handle_cal_effect_df <- function(x, cal.effect.df){
       for(s in x_series_names){
         if (!s %in% series_names){
           cal.effect.df<-rbind(cal.effect.df, c(s, "auto", "Default", TRUE))
-          warning(paste0("The series name ", s, " is in the data but it is not mentionned in cal.effect.df. An automatic calendar detection was processed by default for this series."), call. = FALSE)
+          warning("The series name ", s, " is in the data but it is not mentionned in cal.effect.df. An automatic calendar detection was processed by default for this series.", call. = FALSE)
         }
       }
     } else {
@@ -253,11 +249,9 @@ decimal_period <- function(year, quarter_month, freq){
 
 # Check calendar effect are valid
 check_cal.effect <- function(x, cal.effect){
-  if (frequency(x) == 1){
-    if (cal.effect == "forced"){
-      cal.effect<-"none"
-      warning("You cannot defined cal.effect = 'forced' with yearly data. cal.effect='none' was considered instead.", call. = FALSE)
-    }
+  if (frequency(x) == 1 && cal.effect == "forced"){
+    cal.effect<-"none"
+    warning("You cannot defined cal.effect = 'forced' with yearly data. cal.effect='none' was considered instead.", call. = FALSE)
   }
   return(cal.effect)
 }
@@ -602,7 +596,7 @@ get_table_est <- function(results, stsmodel, cumulator, regressors, x){
       ### regression type
       if (toupper(substr(reg_names[i],1,2)) %in% c("AO","LS","TC","SO")){
         reg_type<-toupper(substr(reg_names[i],1,2))
-      } else if (substr(reg_names[i],1,3) == "CAL"){
+      } else if (startsWith(reg_names[i], "CAL")) {
         reg_type<-"CAL"
       } else {
         reg_type<-"undefined"

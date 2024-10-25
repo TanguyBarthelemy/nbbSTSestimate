@@ -124,11 +124,9 @@ estimateSTS <- function(x,
       stsmodel <- stsmodel.df[1,2]
       stsmodel.df <- NULL
     }
-    if (!is.null(outliers.df)){
-      if (nrow(outliers.df) == 1){
-        outliers <- outliers.df[1,2]
-        outliers.df <- NULL
-      }
+    if (!is.null(outliers.df) && nrow(outliers.df) == 1){
+      outliers <- outliers.df[1,2]
+      outliers.df <- NULL
     }
     if (!is.null(cal.effect.df)){
       cal.effect <- cal.effect.df[1,2]
@@ -160,9 +158,7 @@ estimateSTS <- function(x,
   if (conversion == "Average"){
     x<-x/frequency(x)
   }
-  if (!is.null(path.xlsx)){
-    if (!file.exists(dirname(path.xlsx))) stop("Path xlsx not found!")
-  }
+  if (!is.null(path.xlsx) && !file.exists(dirname(path.xlsx))) stop("Path xlsx not found!")
 
   # I.b. Output initialization
 
@@ -243,7 +239,7 @@ estimateSTS <- function(x,
       xi_dt[, diff_lf_hf := xi_lf_hf - xic]
       xi_dt[, diff_lf_hf_rel := abs(fifelse(xic != 0, diff_lf_hf/xic, diff_lf_hf))]
       if (any(!is.na(xi_dt[,diff_lf_hf]) & xi_dt[,diff_lf_hf_rel] > 0.001)){
-        warning(paste0(namei,": The series could not be processed. This is because some LF data do not match the sum of the corresponding HF data. Please check your input and use a benchmarking tool for this series if necessary."), call. = FALSE)
+        warning(namei,": The series could not be processed. This is because some LF data do not match the sum of the corresponding HF data. Please check your input and use a benchmarking tool for this series if necessary.", call. = FALSE)
         out[[i]] <- list(NULL)
         names(out)[i] <- namei
         x_imputed[,i] <- ts(NA, start=start(x), frequency=freq)
@@ -267,7 +263,7 @@ estimateSTS <- function(x,
         }
 
         if (!processable){
-          warning(paste0(namei,": The series could not processed. This is because missing/non-missing data within some LF period are not regrouped and, therefore, cumulated data could not be computed. These cases cannot yet be handled."), call. = FALSE)
+          warning(namei,": The series could not processed. This is because missing/non-missing data within some LF period are not regrouped and, therefore, cumulated data could not be computed. These cases cannot yet be handled.", call. = FALSE)
           out[[i]] <- list(NULL)
           names(out)[i] <- namei
           x_imputed[,i] <- ts(NA, start=start(xi), frequency=freq)
@@ -346,7 +342,7 @@ estimateSTS <- function(x,
             if (ncol(iv) == 0) iv<-NULL
           } else {
             iv<-NULL
-            warning(paste0(namei, ": Outlier detection could not be performed due to the characteristics of the series. No outlier defined for this series."), call. = FALSE)
+            warning(namei, ": Outlier detection could not be performed due to the characteristics of the series. No outlier defined for this series.", call. = FALSE)
           }
         } else {
           iv<-NULL
@@ -433,7 +429,7 @@ estimateSTS <- function(x,
     res<-try(sts.run(xi_run, stsmodel = stsmodel_selected, cumulator = cumulator, cumulator.ratio = ratio_hflf, regressors = regall), silent = TRUE)
 
     if (inherits(res, "try-error")) {
-      warning(paste0(namei, ": The series could not be processed. It could be an initialization issue. Please check your input or ask for help if necessary."), call. = FALSE)
+      warning(namei, ": The series could not be processed. It could be an initialization issue. Please check your input or ask for help if necessary.", call. = FALSE)
       out[[i]] <- list(NULL)
       names(out)[i] <- namei
       x_imputed[,i] <- ts(NA, start=start(x), frequency=frequency(x))
@@ -454,7 +450,7 @@ estimateSTS <- function(x,
       } else {
         if (is_nonsignificant_iv(res)){
           regall_cleaned<-regall
-          warning(paste0(namei, ": Some specified outliers are not significant."), call. = FALSE) # just a warning if not automatic procedure
+          warning(namei, ": Some specified outliers are not significant.", call. = FALSE) # just a warning if not automatic procedure
         }
       }
     } else {
@@ -466,7 +462,7 @@ estimateSTS <- function(x,
       if (!auto_model && !is_seasonal(xi)){
         include_slope<-is_slope(xi_run, cumulator=cumulator, cumulator.ratio = ratio_hflf, regressors = regall_cleaned)
         suggested_model<-fifelse(include_slope, "Local Linear Trend", "Local Level")
-        warning(paste0(namei, ": A BSM model was selected but statistical evidence shows that a ", suggested_model, " model might be more suited for this series."), call. = FALSE)
+        warning(namei, ": A BSM model was selected but statistical evidence shows that a ", suggested_model, " model might be more suited for this series.", call. = FALSE)
       }
     } else if (stsmodel_selected == "llt"){
       if (auto_model){
@@ -477,9 +473,9 @@ estimateSTS <- function(x,
         }
       } else {
         if (is_seasonal(xi)){
-          warning(paste0(namei, ": A Local Linear Trend model was selected but statistical evidence shows that a BSM model might be more suited for this series."), call. = FALSE)
+          warning(namei, ": A Local Linear Trend model was selected but statistical evidence shows that a BSM model might be more suited for this series.", call. = FALSE)
         } else if (!is_slope(xi_run, cumulator=cumulator, cumulator.ratio = ratio_hflf, regressors = regall_cleaned)){
-          warning(paste0(namei, ": A Local Linear Trend model was selected but statistical evidence shows that a Local level model might be more suited for this series."), call. = FALSE)
+          warning(namei, ": A Local Linear Trend model was selected but statistical evidence shows that a Local level model might be more suited for this series.", call. = FALSE)
         }
       }
     } else if (stsmodel_selected == "ll"){
@@ -491,9 +487,9 @@ estimateSTS <- function(x,
         }
       } else {
         if (is_seasonal(xi)){
-          warning(paste0(namei, ": A Local Level model was selected but statistical evidence shows that a BSM model might be more suited for this series."), call. = FALSE)
+          warning(namei, ": A Local Level model was selected but statistical evidence shows that a BSM model might be more suited for this series.", call. = FALSE)
         } else if (is_slope(xi_run, cumulator=cumulator, cumulator.ratio = ratio_hflf, regressors = regall_cleaned)){
-          warning(paste0(namei, ": A Local Level model was selected but statistical evidence shows that a Local Linear Trend model might be more suited for this series."), call. = FALSE)
+          warning(namei, ": A Local Level model was selected but statistical evidence shows that a Local Linear Trend model might be more suited for this series.", call. = FALSE)
         }
       }
     } else if (stsmodel_selected == "noise"){
@@ -506,11 +502,11 @@ estimateSTS <- function(x,
         }
       } else {
         if (is_seasonal(xi)){
-          warning(paste0(namei, ": A Noise model was selected but statistical evidence shows that a BSM model might be more suited for this series."), call. = FALSE)
+          warning(namei, ": A Noise model was selected but statistical evidence shows that a BSM model might be more suited for this series.", call. = FALSE)
         } else if (is_trend(xi_run, cumulator=cumulator, cumulator.ratio = ratio_hflf, regressors = regall_cleaned)){
           include_slope<-is_slope(xi_run, cumulator=cumulator, cumulator.ratio = ratio_hflf, regressors = regall_cleaned)
           suggested_model<-fifelse(include_slope, "Local Linear Trend", "Local Level")
-          warning(paste0(namei, ": A Noise model was selected but statistical evidence shows that a ", suggested_model, " model might be more suited for this series."), call. = FALSE)
+          warning(namei, ": A Noise model was selected but statistical evidence shows that a ", suggested_model, " model might be more suited for this series.", call. = FALSE)
         }
       }
     }
