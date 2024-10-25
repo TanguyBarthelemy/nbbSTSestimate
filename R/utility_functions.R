@@ -304,14 +304,14 @@ is_seasonal <- function(x){
     test_succeeded<-c(!inherits(qs_pval, "try-error"), !inherits(f_pval, "try-error"), !inherits(friedman_pval, "try-error"))
     if (all(test_succeeded)){
       pvals<-c(qs_pval, f_pval, friedman_pval)
-      include_seasonality<-fifelse(length(pvals[which(pvals < .05)])>=2, TRUE, FALSE)
+      include_seasonality<-length(pvals[which(pvals < .05)])>=2
     } else if (any(test_succeeded)){
       if (test_succeeded[1]){
-        include_seasonality<-fifelse(qs_pval<.01,TRUE,FALSE)
+        include_seasonality<-qs_pval<.01
       } else if (test_succeeded[2]){
-        include_seasonality<-fifelse(f_pval<.01,TRUE,FALSE)
+        include_seasonality<-f_pval<.01
       } else if (test_succeeded[3]){
-        include_seasonality<-fifelse(friedman_pval<.01,TRUE,FALSE)
+        include_seasonality<-friedman_pval<.01
       }
     } else {
       include_seasonality<-FALSE
@@ -716,7 +716,7 @@ is_nonsignificant_iv <- function(results){
   t_outliers<-t[substr(names(t),1,2) %in% c("AO","LS","TC","SO")]
   t_outliers_ns<-t_outliers[abs(t_outliers)<1.96]
 
-  include_nonsignificant_iv<-fifelse(length(t_outliers_ns) > 0, TRUE, FALSE)
+  include_nonsignificant_iv<-length(t_outliers_ns) > 0
 
   return(include_nonsignificant_iv)
 }
@@ -755,17 +755,17 @@ is_slope <- function(x, cumulator, cumulator.ratio, regressors){
   res_llt<-try(sts.run(x, stsmodel = "llt", cumulator = cumulator, cumulator.ratio = cumulator.ratio, regressors = regressors), silent=TRUE)
 
   if (!inherits(res_llt, "try-error")) {
-    constant_slope<-fifelse(var(res_llt$table[,"Slope"]) == 0,TRUE,FALSE)
+    constant_slope<-var(res_llt$table[,"Slope"]) == 0
     if (constant_slope){
       slope_est<-as.numeric(res_llt$table[1,"Slope"])
       t<-slope_est/sqrt(res_llt$vslope)
-      include_slope<-fifelse(abs(t)>1.96,TRUE,FALSE)
+      include_slope<-abs(t)>1.96
     } else {
       res_ll<-try(sts.run(x, stsmodel = "ll", cumulator = cumulator, cumulator.ratio = cumulator.ratio, regressors = regressors), silent=TRUE)
       if (!inherits(res_ll, "try-error")) {
         ser_llt<-res_llt$likelihood$ser
         ser_ll<-res_ll$likelihood$ser
-        include_slope<-fifelse(ser_llt<ser_ll,TRUE,FALSE)
+        include_slope<-ser_llt<ser_ll
       } else {
         include_slope<-TRUE
       }
@@ -789,16 +789,16 @@ is_trend <- function(x, cumulator, cumulator.ratio, regressors){
         ser_llt<-res_llt$likelihood$ser
         ser_ll<-res_ll$likelihood$ser
         ser_noise<-res_noise$likelihood$ser
-        include_trend<-fifelse(ser_noise > ser_llt | ser_noise > ser_ll, TRUE, FALSE)
+        include_trend<-ser_noise > ser_llt | ser_noise > ser_ll
     } else if (any(test_succeeded)){
         if (test_succeeded[1] && !test_succeeded[2] && test_succeeded[3]){
             ser_llt<-res_llt$likelihood$ser
             ser_noise<-res_noise$likelihood$ser
-            include_trend<-fifelse(ser_noise > ser_llt, TRUE, FALSE)
+            include_trend<-ser_noise > ser_llt
         } else if (test_succeeded[1] && !test_succeeded[2] && test_succeeded[3]){
             ser_ll<-res_ll$likelihood$ser
             ser_noise<-res_noise$likelihood$ser
-            include_trend<-fifelse(ser_noise > ser_ll, TRUE, FALSE)
+            include_trend<-ser_noise > ser_ll
         } else if (!test_succeeded[1] && !test_succeeded[2] && test_succeeded[3]){
             include_trend<-FALSE
         } else {

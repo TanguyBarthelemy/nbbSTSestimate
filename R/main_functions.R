@@ -288,7 +288,7 @@ estimateSTS <- function(x,
       stsmodel<-stsmodel_df[stsmodel_df$series_name == namei,]$stsmodel
     }
 
-    auto_model<-fifelse(stsmodel == "auto", TRUE, FALSE)
+    auto_model<-stsmodel == "auto"
 
     if (auto_model){
       if (is_seasonal(xi)){
