@@ -35,16 +35,7 @@ linters: lintr::all_linters(
         keyword_quote_linter = NULL,
         missing_package_linter = NULL,
         unnecessary_concatenation_linter = NULL,
-        # strings_as_factors_linter = NULL,
-        # class_equals_linter = NULL,
-        # namespace_linter = NULL,
-        # inner_combine_linter = NULL,
-        # paste_linter = NULL,
-        # unnecessary_lambda_linter = NULL,
-        # unnecessary_nested_if_linter = NULL,
-        # condition_message_linter = NULL,
-        # if_not_else_linter = NULL,
-        # redundant_ifelse_linter = NULL,
+        if_not_else_linter = NULL,
         string_boundary_linter = NULL
     )
 encoding: "UTF-8"
