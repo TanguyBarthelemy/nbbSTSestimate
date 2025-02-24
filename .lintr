@@ -36,6 +36,13 @@ linters: lintr::all_linters(
         missing_package_linter = NULL,
         unnecessary_concatenation_linter = NULL,
         if_not_else_linter = NULL,
-        string_boundary_linter = NULL
+        string_boundary_linter = NULL,
+        return_linter = NULL,
+        object_overwrite_linter = NULL,
+        condition_call_linter = NULL,
+        rep_len_linter = NULL,
+        if_switch_linter = NULL,
+        unnecessary_nesting_linter = NULL,
+        comparison_negation_linter = NULL
     )
 encoding: "UTF-8"
