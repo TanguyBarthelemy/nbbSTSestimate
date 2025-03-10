@@ -24,5 +24,5 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
 [Unreleased]: https://github.com/clemasso/nbbSTSestimate/compare/v1.0.1...HEAD
-[1.0.1]: https://github.com/clemasso/nbbSTSestimate/releases/tag/v1.0.0...v1.0.1
+[1.0.1]: https://github.com/clemasso/nbbSTSestimate/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/clemasso/nbbSTSestimate/releases/tag/v1.0.0
