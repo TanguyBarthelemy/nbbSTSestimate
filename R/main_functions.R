@@ -75,9 +75,9 @@
 #' @return an object of class "nbb.estimateSTS.output"
 #' @export
 #' @examples
-#' retail_extract<-cbind(GroceryStores=rjd3toolkit::retail$GroceryStores,
-#'                       BookStores=rjd3toolkit::retail$BookStores,
-#'                       ShoeStores=rjd3toolkit::retail$ShoeStores)
+#' retail_extract<-cbind(GroceryStores=rjd3toolkit::Retail$GroceryStores,
+#'                       BookStores=rjd3toolkit::Retail$BookStores,
+#'                       ShoeStores=rjd3toolkit::Retail$ShoeStores)
 #'
 #' x<-window(retail_extract, c(1990,1), c(2012,6), extend = TRUE)
 #' x.lf<-ts(rbind(matrix(c(325000,330000,7800,8000,17500,18000), nrow = 2, byrow = FALSE),

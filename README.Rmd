@@ -47,9 +47,9 @@ library("nbbSTSestimate")
 # Examples
 ## Input: retail data, 3 series
 retail_extract <- cbind(
-    GroceryStores = rjd3toolkit::retail$GroceryStores,
-    BookStores = rjd3toolkit::retail$BookStores,
-    ShoeStores = rjd3toolkit::retail$ShoeStores
+    GroceryStores = rjd3toolkit::Retail$GroceryStores,
+    BookStores = rjd3toolkit::Retail$BookStores,
+    ShoeStores = rjd3toolkit::Retail$ShoeStores
 )
 x <- window(retail_extract, c(1990, 1), c(2012, 6), extend = TRUE)
 x.lf <- ts(rbind(
